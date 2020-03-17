@@ -35,7 +35,7 @@ public func broadcast<Value: Encodable, Action>(_ reducer: @escaping Reducer<Val
         return [.fireAndForget {
             if let data = try? JSONEncoder().encode(newValue) {
                 print("📡 Broadcasting state ...")
-                let msg = Message(kind: .record, action: "\(action)", state: data)
+                let msg = Message(command: .record, action: "\(action)", state: data)
                 Transceiver.shared.broadcast(msg)
             }
             }] + effects
@@ -49,7 +49,13 @@ public struct Message: Hashable, Codable {
         case reset
     }
 
-    public let kind: Command
+    public let command: Command
     public let action: String
     public let state: Data?
+
+    init(command: Command, action: String, state: Data?) {
+        self.command = command
+        self.action = action
+        self.state = state
+    }
 }
