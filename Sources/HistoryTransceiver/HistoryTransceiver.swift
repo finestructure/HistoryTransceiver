@@ -53,7 +53,7 @@ public struct Message: Hashable, Codable {
     public let action: String
     public let state: Data?
 
-    init(command: Command, action: String, state: Data?) {
+    public init(command: Command, action: String, state: Data?) {
         self.command = command
         self.action = action
         self.state = state
