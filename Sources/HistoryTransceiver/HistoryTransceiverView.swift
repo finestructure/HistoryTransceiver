@@ -11,14 +11,22 @@ import CompArch
 import SwiftUI
 
 
-public protocol StateInitializable {
+public protocol StateInitializable: Codable {
     init()
     init?(from data: Data)
 }
 
 
+extension StateInitializable {
+    public init?(from data: Data) {
+        guard let state = try? JSONDecoder().decode(Self.self, from: data) else { return nil }
+        self = state
+    }
+}
+
+
 public protocol StateSurfable: View {
-    associatedtype State: Codable, StateInitializable
+    associatedtype State: StateInitializable
     associatedtype Action
     var store: Store<State, Action> { get set }
     static var reducer: Reducer<State, Action> { get }
