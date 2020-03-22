@@ -13,7 +13,7 @@ import SwiftUI
 
 public protocol StateInitializable {
     init()
-    init?(from: Data)
+    init?(from data: Data)
 }
 
 
