@@ -28,7 +28,7 @@ extension StateInitializable {
 public protocol StateSurfable: View {
     associatedtype State: StateInitializable
     associatedtype Action
-    var store: Store<State, Action> { get set }
+    var store: Store<State, Action> { get }
     static var reducer: Reducer<State, Action> { get }
     static func body(store: Store<State, Action>) -> Self
 }
