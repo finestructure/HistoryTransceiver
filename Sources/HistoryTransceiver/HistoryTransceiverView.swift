@@ -77,9 +77,18 @@ extension HistoryTransceiverView {
         return combine(mainReducer, contentViewReducer)
     }
 
-    public static func store() -> Store<State, Action> {
+    public init() {
         let initial = State(contentView: .init())
-        return Store(initialValue: initial, reducer: reducer)
+        self.store = Store(initialValue: initial, reducer: Self.reducer)
+    }
+
+    public func resume() {
+        Transceiver.shared.receive(Message.self) { msg in
+            if msg.command == .reset {
+                self.store.send(.updateState(msg.state))
+            }
+        }
+        Transceiver.shared.resume()
     }
 }
 
