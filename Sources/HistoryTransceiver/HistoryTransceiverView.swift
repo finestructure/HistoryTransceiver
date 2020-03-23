@@ -35,7 +35,7 @@ public protocol StateSurfable: View {
 
 
 public struct HistoryTransceiverView<CV: StateSurfable>: View {
-    @ObservedObject var store: Store<State, Action>
+    @ObservedObject public private(set) var store: Store<State, Action>
 
     public var body: some View {
         CV.body(store: store.view(value: { $0.contentView },
