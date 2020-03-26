@@ -31,6 +31,7 @@ public protocol StateSurfable: View {
     associatedtype Environment
     var store: Store<State, Action> { get }
     static var reducer: Reducer<State, Action, Environment> { get }
+    static var environment: Environment { get }
     static func body(store: Store<State, Action>) -> Self
 }
 
@@ -44,9 +45,16 @@ public struct HistoryTransceiverView<CV: StateSurfable>: View {
                                    action: { .contentView($0) }))
     }
 
-    public init(store: Store<State, Action>) {
-        self.store = store
-        self.viewStore = self.store.view()
+//    public init(store: Store<State, Action>) {
+//        self.store = store
+//        self.viewStore = self.store.view()
+//    }
+
+    public init() {
+        let initial = State(contentView: .init())
+        store = Store(initialState: initial, reducer: Self.reducer, environment: CV.environment)
+        viewStore = self.store.view()
+//        self.init(store: store)
     }
 }
 
