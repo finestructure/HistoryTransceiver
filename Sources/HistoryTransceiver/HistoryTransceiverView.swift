@@ -11,7 +11,8 @@ import ComposableArchitecture
 import SwiftUI
 
 
-public protocol StateInitializable: Codable {
+// FIXME: see if we can avoid constraining to `Equatable`
+public protocol StateInitializable: Codable, Equatable {
     init()
     init?(from data: Data)
 }
@@ -31,13 +32,13 @@ public protocol StateSurfable: View {
     associatedtype Environment
     var store: Store<State, Action> { get }
     static var reducer: Reducer<State, Action, Environment> { get }
-    static var environment: Environment { get }
     static func body(store: Store<State, Action>) -> Self
 }
 
 
 public struct HistoryTransceiverView<CV: StateSurfable>: View {
-    public private(set) var store: Store<State, Action>
+    let store: Store<State, Action>
+    @ObservedObject var viewStore: ViewStore<State, Action>
 
     public var body: some View {
         CV.body(store: store.scope(state: { $0.contentView },
@@ -46,12 +47,13 @@ public struct HistoryTransceiverView<CV: StateSurfable>: View {
 
     public init(store: Store<State, Action>) {
         self.store = store
+        self.viewStore = self.store.view()
     }
 }
 
 
 extension HistoryTransceiverView {
-    public struct State {
+    public struct State: Equatable {
         var contentView: CV.State
     }
 
@@ -60,36 +62,29 @@ extension HistoryTransceiverView {
         case updateState(Data?)
     }
 
-    static var reducer: Reducer<State, Action, Any> {
-        let mainReducer: Reducer<State, Action, Any> = .init { state, action, _ in
+    static var reducer: Reducer<State, Action, CV.Environment> {
+        let mainReducer: Reducer<State, Action, CV.Environment> = .init { state, action, _ in
             switch action {
                 case .contentView:
-                    return []
+                    return .noop
                 case .updateState(let data):
                     state.contentView = data.flatMap(CV.State.init(from:)) ?? .init()
-                    return []
+                    return .noop
             }
         }
 
-//        let contentViewReducer = pullback(
-//            broadcast(CV.reducer),
-//            value: \State.contentView,
-//            action: /Action.contentView,
-//            environment: { $0 })
+        let contentViewReducer = broadcast(CV.reducer)
+            .pullback(state: \State.contentView,
+                      action: /Action.contentView,
+                      environment: { $0 })
 
-//        return combine(mainReducer, contentViewReducer)
-        return mainReducer
-    }
-
-    public init() {
-        let initial = State(contentView: .init())
-        self.store = Store(initialState: initial, reducer: Self.reducer, environment: Self.environment)
+        return Reducer.combine(mainReducer, contentViewReducer)
     }
 
     public func resume() {
         Transceiver.shared.receive(Message.self) { msg in
             if msg.command == .reset {
-                self.store.send(.updateState(msg.state))
+                self.viewStore.send(.updateState(msg.state))
             }
         }
         Transceiver.shared.resume()

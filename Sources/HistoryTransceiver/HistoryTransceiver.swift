@@ -6,7 +6,8 @@
 //  Copyright © 2020 finestructure. All rights reserved.
 //
 
-//import CompArch
+import Combine
+import ComposableArchitecture
 import Foundation
 import MultipeerKit
 
@@ -28,17 +29,22 @@ public enum Transceiver {
 }
 
 
-public func broadcast<Value: Encodable, Action>(_ reducer: @escaping Reducer<Value, Action>) -> Reducer<Value, Action> {
-    return { value, action in
-        let effects = reducer(&value, action)
+// TODO: make method on Reducer?
+public func broadcast<Value: Encodable, Action, Environment>(_ reducer: Reducer<Value, Action, Environment>) -> Reducer<Value, Action, Environment> {
+    return .init { value, action, environment in
+        let effect = reducer(&value, action, environment)
         let newValue = value
-        return [.fireAndForget {
-            if let data = try? JSONEncoder().encode(newValue) {
-                print("📡 Broadcasting state ...")
-                let msg = Message(command: .record, action: "\(action)", state: data)
-                Transceiver.shared.broadcast(msg)
-            }
-            }] + effects
+        return Publishers.Concatenate(
+            prefix: Effect.fireAndForget {
+                if let data = try? JSONEncoder().encode(newValue) {
+                    print("📡 Broadcasting state ...")
+                    let msg = Message(command: .record, action: "\(action)", state: data)
+                    Transceiver.shared.broadcast(msg)
+                }
+            },
+            suffix: effect
+        )
+        .eraseToEffect()
     }
 }
 
