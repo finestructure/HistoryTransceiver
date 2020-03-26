@@ -14,7 +14,7 @@
         "package": "swift-composable-architecture",
         "repositoryURL": "https://github.com/stephencelis/swift-composable-architecture",
         "state": {
-          "branch": null,
+          "branch": "master",
           "revision": "dd300672fbb96495a725729d2b0cac69e2855979",
           "version": null
         }

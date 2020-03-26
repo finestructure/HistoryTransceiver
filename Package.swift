@@ -13,7 +13,7 @@ let package = Package(
             targets: ["HistoryTransceiver"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/stephencelis/swift-composable-architecture", .revision("dd300672fbb96495a725729d2b0cac69e2855979")),
+        .package(url: "https://github.com/stephencelis/swift-composable-architecture", .branch("master")),
         .package(url: "https://github.com/insidegui/MultipeerKit", from: "0.1.2")
     ],
     targets: [
