@@ -6,7 +6,6 @@
 //  Copyright © 2020 finestructure. All rights reserved.
 //
 
-import CasePaths
 import ComposableArchitecture
 import SwiftUI
 
