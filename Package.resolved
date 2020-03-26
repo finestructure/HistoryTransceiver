@@ -2,15 +2,6 @@
   "object": {
     "pins": [
       {
-        "package": "CompArch",
-        "repositoryURL": "https://github.com/finestructure/CompArch",
-        "state": {
-          "branch": null,
-          "revision": "b3bbb247b18b29549e905e31e5a19ebc46d1cefb",
-          "version": "0.7.2"
-        }
-      },
-      {
         "package": "MultipeerKit",
         "repositoryURL": "https://github.com/insidegui/MultipeerKit",
         "state": {
@@ -26,6 +17,15 @@
           "branch": null,
           "revision": "a9c1e05518b6d95cf5844d823020376f2b6ff842",
           "version": "0.1.0"
+        }
+      },
+      {
+        "package": "swift-composable-architecture",
+        "repositoryURL": "https://github.com/stephencelis/swift-composable-architecture",
+        "state": {
+          "branch": null,
+          "revision": "fa41a383ef891f1a1d4980cb557edc9e01496439",
+          "version": null
         }
       }
     ]

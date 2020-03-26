@@ -13,7 +13,8 @@ let package = Package(
             targets: ["HistoryTransceiver"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/finestructure/CompArch", from: "0.7.2"),
+        .package(url: "https://github.com/stephencelis/swift-composable-architecture", .revision("fa41a383ef891f1a1d4980cb557edc9e01496439")),
+        .package(url: "https://github.com/pointfreeco/swift-case-paths", from: "0.1.0"),
         .package(url: "https://github.com/insidegui/MultipeerKit", from: "0.1.2")
     ],
     targets: [
@@ -21,6 +22,6 @@ let package = Package(
         // Targets can depend on other targets in this package, and on products in packages which this package depends on.
         .target(
             name: "HistoryTransceiver",
-            dependencies: ["CompArch", "MultipeerKit"]),
+            dependencies: ["CasePaths", "ComposableArchitecture", "MultipeerKit"]),
     ]
 )

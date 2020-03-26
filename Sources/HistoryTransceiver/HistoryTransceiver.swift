@@ -6,7 +6,7 @@
 //  Copyright © 2020 finestructure. All rights reserved.
 //
 
-import CompArch
+//import CompArch
 import Foundation
 import MultipeerKit
 

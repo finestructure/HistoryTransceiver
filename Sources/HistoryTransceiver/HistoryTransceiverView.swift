@@ -7,7 +7,7 @@
 //
 
 import CasePaths
-import CompArch
+import ComposableArchitecture
 import SwiftUI
 
 
@@ -28,18 +28,20 @@ extension StateInitializable {
 public protocol StateSurfable: View {
     associatedtype State: StateInitializable
     associatedtype Action
+    associatedtype Environment
     var store: Store<State, Action> { get }
-    static var reducer: Reducer<State, Action> { get }
+    static var reducer: Reducer<State, Action, Environment> { get }
+    static var environment: Environment { get }
     static func body(store: Store<State, Action>) -> Self
 }
 
 
 public struct HistoryTransceiverView<CV: StateSurfable>: View {
-    @ObservedObject public private(set) var store: Store<State, Action>
+    public private(set) var store: Store<State, Action>
 
     public var body: some View {
-        CV.body(store: store.view(value: { $0.contentView },
-                                  action: { .contentView($0) }))
+        CV.body(store: store.scope(state: { $0.contentView },
+                                   action: { .contentView($0) }))
     }
 
     public init(store: Store<State, Action>) {
@@ -58,8 +60,8 @@ extension HistoryTransceiverView {
         case updateState(Data?)
     }
 
-    static var reducer: Reducer<State, Action> {
-        let mainReducer: Reducer<State, Action> = { state, action in
+    static var reducer: Reducer<State, Action, Any> {
+        let mainReducer: Reducer<State, Action, Any> = .init { state, action, _ in
             switch action {
                 case .contentView:
                     return []
@@ -69,17 +71,19 @@ extension HistoryTransceiverView {
             }
         }
 
-        let contentViewReducer = pullback(
-            broadcast(CV.reducer),
-            value: \State.contentView,
-            action: /Action.contentView)
+//        let contentViewReducer = pullback(
+//            broadcast(CV.reducer),
+//            value: \State.contentView,
+//            action: /Action.contentView,
+//            environment: { $0 })
 
-        return combine(mainReducer, contentViewReducer)
+//        return combine(mainReducer, contentViewReducer)
+        return mainReducer
     }
 
     public init() {
         let initial = State(contentView: .init())
-        self.store = Store(initialValue: initial, reducer: Self.reducer)
+        self.store = Store(initialState: initial, reducer: Self.reducer, environment: Self.environment)
     }
 
     public func resume() {
